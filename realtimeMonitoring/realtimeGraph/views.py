@@ -523,6 +523,8 @@ def get_map_json(request, **kwargs):
     measureParam = kwargs.get("measure", None)
     selectedMeasure = None
     measurements = Measurement.objects.all()
+    greater_than = []
+    
 
     if measureParam != None:
         selectedMeasure = Measurement.objects.filter(name=measureParam)[0]
@@ -551,7 +553,9 @@ def get_map_json(request, **kwargs):
     elif start == None:
         start = datetime.fromtimestamp(0)
 
+
     data = []
+    greater_than = []
 
     for location in locations:
         stations = Station.objects.filter(location=location)
@@ -575,6 +579,16 @@ def get_map_json(request, **kwargs):
             'avg': round(avgVal if avgVal != None else 0, 2),
         })
 
+        ref_value = float(request.GET.get("ref", None))
+
+        if avgVal <= ref_value:
+            greater_than.append({
+            'greater': ref_value,
+            })
+        elif avgVal > ref_value:
+            continue
+
+
     startFormatted = start.strftime("%d/%m/%Y") if start != None else " "
     endFormatted = end.strftime("%d/%m/%Y") if end != None else " "
 
@@ -582,6 +596,7 @@ def get_map_json(request, **kwargs):
     data_result["start"] = startFormatted
     data_result["end"] = endFormatted
     data_result["data"] = data
+    data_result["greater_than"] = greater_than
 
     return JsonResponse(data_result)
 

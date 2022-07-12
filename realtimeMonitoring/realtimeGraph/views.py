@@ -523,7 +523,6 @@ def get_map_json(request, **kwargs):
     measureParam = kwargs.get("measure", None)
     selectedMeasure = None
     measurements = Measurement.objects.all()
-    greater_than = []
     
 
     if measureParam != None:
@@ -581,11 +580,11 @@ def get_map_json(request, **kwargs):
 
         ref_value = float(request.GET.get("ref", None))
 
-        if avgVal <= ref_value:
+        if maxVal <= ref_value:
             greater_than.append({
-            'greater': ref_value,
+            'greater': maxVal,
             })
-        elif avgVal > ref_value:
+        elif maxVal > ref_value:
             continue
 
 

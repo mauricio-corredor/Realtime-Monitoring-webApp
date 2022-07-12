@@ -527,6 +527,8 @@ def get_map_json(request, **kwargs):
         start = datetime.fromtimestamp(0)
 
     data = []
+    greater_than = []
+    newData = []
 
     start_ts = int(start.timestamp() * 1000000)
     end_ts = int(end.timestamp() * 1000000)
@@ -541,6 +543,9 @@ def get_map_json(request, **kwargs):
         minVal = locationData.aggregate(Min("min_value"))["min_value__min"]
         maxVal = locationData.aggregate(Max("max_value"))["max_value__max"]
         avgVal = locationData.aggregate(Avg("avg_value"))["avg_value__avg"]
+        sumVal = locationData.aggregate(Sum('value'))['sum_value__sum']
+
+
         data.append(
             {
                 "name": f"{location.city.name}, {location.state.name}, {location.country.name}",
@@ -553,13 +558,37 @@ def get_map_json(request, **kwargs):
             }
         )
 
+        newData.append(
+            {
+            'name': f'{location.city.name}, {location.state.name}, {location.country.name}',
+            'min': minVal if minVal != None else 0,
+            'max': maxVal if maxVal != None else 0,
+            'avg': round(avgVal if avgVal != None else 0, 2),
+            'sumVal': sumVal if sumVal != None else 0,
+            }
+        )
+
+        ref_value = float(request.GET.get("ref", None))
+        diffVal = ref_value - avgVal
+
+        if ref_value >= avgVal:  #diferencia entre valor registrado y el valor promedio. si es mayor continua
+            greater_than.append({
+            'greater': maxVal,
+            'ref': ref_value,
+            'dif': diffVal, # valor diferencial entre promedio y la referencia dada por el usuario
+            })
+        elif ref_value < avgVal:
+            continue
+
     startFormatted = start.strftime("%d/%m/%Y") if start != None else " "
     endFormatted = end.strftime("%d/%m/%Y") if end != None else " "
 
     data_result["locations"] = [loc.str() for loc in locations]
     data_result["start"] = startFormatted
     data_result["end"] = endFormatted
-    data_result["data"] = data
+    data_result["newData"] = newData
+    data_result["greater_than"] = greater_than
+
 
     return JsonResponse(data_result)
 

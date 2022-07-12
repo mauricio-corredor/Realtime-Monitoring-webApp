@@ -573,7 +573,7 @@ def get_map_json(request, **kwargs):
         sumVal = locationData.aggregate(
             Sum('value'))['value__sum']
         
-        avgCal = sumVal/locationData.count()
+
         data.append({
             'name': f'{location.city.name}, {location.state.name}, {location.country.name}',
             'lat': location.lat,
@@ -589,7 +589,7 @@ def get_map_json(request, **kwargs):
             'min': minVal if minVal != None else 0,
             'max': maxVal if maxVal != None else 0,
             'avg': round(avgVal if avgVal != None else 0, 2),
-            'avgCal': avgCal if avgCal != None else 0,
+            'sumVal': sumVal if sumVal != None else 0,
         })
 
         ref_value = float(request.GET.get("ref", None))

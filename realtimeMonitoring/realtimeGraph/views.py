@@ -608,7 +608,7 @@ def get_map_json(request, **kwargs):
     data_result["locations"] = [loc.str() for loc in locations]
     data_result["start"] = startFormatted
     data_result["end"] = endFormatted
-    data_result["data"] = newData
+    data_result["newData"] = newData
     data_result["greater_than"] = greater_than
 
     return JsonResponse(data_result)

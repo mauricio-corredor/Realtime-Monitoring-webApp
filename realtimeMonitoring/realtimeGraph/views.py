@@ -573,7 +573,7 @@ def get_map_json(request, **kwargs):
         sumVal = locationData.aggregate(
             Sum('value'))['value__sum']
         
-        avgCal = sumVal/locationData.count
+        avgCal = sumVal/locationData.count()
         data.append({
             'name': f'{location.city.name}, {location.state.name}, {location.country.name}',
             'lat': location.lat,

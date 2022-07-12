@@ -596,7 +596,7 @@ def get_map_json(request, **kwargs):
 
         if ref_value >= avgVal:
             greater_than.append({
-            'greater': locationData.all,
+            'greater': sumVal,
             })
         elif ref_value < avgVal:
             continue

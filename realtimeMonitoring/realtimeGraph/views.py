@@ -555,6 +555,7 @@ def get_map_json(request, **kwargs):
 
     data = []
     greater_than = []
+    newData = []
 
     for location in locations:
         stations = Station.objects.filter(location=location)
@@ -568,6 +569,11 @@ def get_map_json(request, **kwargs):
             Max('value'))['value__max']
         avgVal = locationData.aggregate(
             Avg('value'))['value__avg']
+
+        sumVal = locationData.aggregate(
+            Sum('value'))['value__sum']
+        
+        avgCal = sumVal/locationData.count
         data.append({
             'name': f'{location.city.name}, {location.state.name}, {location.country.name}',
             'lat': location.lat,
@@ -578,13 +584,21 @@ def get_map_json(request, **kwargs):
             'avg': round(avgVal if avgVal != None else 0, 2),
         })
 
+        newData.append({
+            'name': f'{location.city.name}, {location.state.name}, {location.country.name}',
+            'min': minVal if minVal != None else 0,
+            'max': maxVal if maxVal != None else 0,
+            'avg': round(avgVal if avgVal != None else 0, 2),
+            'avgCal': avgCal if avgCal != None else 0,
+        })
+
         ref_value = float(request.GET.get("ref", None))
 
-        if maxVal <= ref_value:
+        if ref_value >= avgVal:
             greater_than.append({
-            'greater': maxVal,
+            'greater': locationData.all,
             })
-        elif maxVal > ref_value:
+        elif ref_value < avgVal:
             continue
 
 
@@ -594,7 +608,7 @@ def get_map_json(request, **kwargs):
     data_result["locations"] = [loc.str() for loc in locations]
     data_result["start"] = startFormatted
     data_result["end"] = endFormatted
-    data_result["data"] = data
+    data_result["data"] = newData
     data_result["greater_than"] = greater_than
 
     return JsonResponse(data_result)

@@ -593,10 +593,13 @@ def get_map_json(request, **kwargs):
         })
 
         ref_value = float(request.GET.get("ref", None))
+        calAvg = sumVal/locations.size()
 
         if ref_value >= avgVal:
             greater_than.append({
-            'greater': sumVal,
+            'greater': maxVal,
+            'ref': ref_value,
+            'calAvg': calAvg, 
             })
         elif ref_value < avgVal:
             continue

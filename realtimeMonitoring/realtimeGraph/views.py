@@ -543,7 +543,7 @@ def get_map_json(request, **kwargs):
         minVal = locationData.aggregate(Min("min_value"))["min_value__min"]
         maxVal = locationData.aggregate(Max("max_value"))["max_value__max"]
         avgVal = locationData.aggregate(Avg("avg_value"))["avg_value__avg"]
-        sumVal = locationData.aggregate(Sum("value"))
+
 
 
         data.append(
@@ -564,7 +564,6 @@ def get_map_json(request, **kwargs):
             'min': minVal if minVal != None else 0,
             'max': maxVal if maxVal != None else 0,
             'avg': round(avgVal if avgVal != None else 0, 2),
-            'sumVal': sumVal if sumVal != None else 0,
             }
         )
 
